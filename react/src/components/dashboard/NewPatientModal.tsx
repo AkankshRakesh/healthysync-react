@@ -17,6 +17,7 @@ export default function NewPatientModal({ open, onClose }: Props) {
   const [query, setQuery] = useState("")
   const [suggestions, setSuggestions] = useState<Array<{ name: string; code: string }>>([])
   const [selectedCode, setSelectedCode] = useState<string | null>(null)
+  const [selectedName, setSelectedName] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [loadingSuggestions, setLoadingSuggestions] = useState(false)
   const [suggestError, setSuggestError] = useState<string | null>(null)
@@ -27,8 +28,9 @@ export default function NewPatientModal({ open, onClose }: Props) {
       setAge("")
       setQuery("")
       setSuggestions([])
-      setSelectedCode(null)
-      setSaving(false)
+  setSelectedCode(null)
+  setSelectedName(null)
+  setSaving(false)
     }
   }, [open])
 
@@ -127,7 +129,7 @@ export default function NewPatientModal({ open, onClose }: Props) {
     e?.preventDefault()
     if (!canSubmit) return
     setSaving(true)
-    const payload = { name, age: Number(age), icd11: selectedCode }
+  const payload = { name, age: Number(age), icd11: selectedCode, disease: selectedName || query }
     try {
       // try to POST to backend if available via authFetch
       if (authFetch) {
@@ -167,13 +169,13 @@ export default function NewPatientModal({ open, onClose }: Props) {
 
           <div>
             <label className="block text-sm text-muted-foreground mb-1">Disease (search)</label>
-            <Input value={query} onChange={e => { setQuery(e.target.value); setSelectedCode(null) }} placeholder="Search disease name e.g. malaria" />
+            <Input value={query} onChange={e => { setQuery(e.target.value); setSelectedCode(null); setSelectedName(null) }} placeholder="Search disease name e.g. malaria" />
             {loadingSuggestions && <div className="mt-2 text-sm text-muted-foreground">Searching…</div>}
             {suggestError && <div className="mt-2 text-sm text-destructive">{suggestError}</div>}
             {suggestions.length > 0 && (
               <ul className="mt-2 max-h-40 overflow-auto border border-border rounded-md bg-background">
                 {suggestions.map(s => (
-                  <li key={s.code} className="px-3 py-2 hover:bg-accent cursor-pointer flex justify-between" onClick={() => { setQuery(s.name); setSelectedCode(s.code); setSuggestions([]) }}>
+                  <li key={s.code} className="px-3 py-2 hover:bg-accent cursor-pointer flex justify-between" onClick={() => { setQuery(s.name); setSelectedCode(s.code); setSelectedName(s.name); setSuggestions([]) }}>
                     <span className="capitalize">{s.name}</span>
                     <span className="text-sm text-muted-foreground">{s.code}</span>
                   </li>

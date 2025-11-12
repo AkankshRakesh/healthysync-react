@@ -19,6 +19,21 @@ export function Login() {
 	const [error, setError] = useState<string | null>(null)
 	const auth = useAuth()
 
+	async function godummy(e: React.MouseEvent) {
+		e.preventDefault()
+		setError(null)
+		setLoading(true)
+		try {
+			await auth.login("test@gmail.com", "testacc", false);
+			navigate('/dashboard')
+		} catch (err: unknown) {
+			const msg = err instanceof Error ? err.message : String(err)
+			setError(msg || 'Sign in failed')
+		} finally {
+			setLoading(false)
+		}
+	}
+
 	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault()
 		setError(null)
@@ -111,10 +126,16 @@ export function Login() {
 									</Button>
 								</div>
 
-								<div className="text-center text-sm text-muted-foreground">
+								{/* <div className="text-center text-sm text-muted-foreground">
 									Don’t have an account?{' '}
 									<Link to="/signup" className="text-primary hover:underline">
 										Get started
+									</Link>
+								</div> */}
+								<div className="text-center text-sm text-muted-foreground">
+									Want to explore the dashboard?{' '}
+									<Link to="/signup" onClick={godummy} className="text-primary hover:underline">
+										Test with demo account
 									</Link>
 								</div>
 							</form>
